@@ -1,0 +1,62 @@
+#+TITLE: Notes projet micro-laser
+#+AUTHOR: Tan
+
+
+* Interfacer MDT694B avec Linux
+
+Problème potentiel : pas de driver pour linux.
+
+Peut-être qu'une communication serial en USB peut suffire :/
+https://github.com/amsikking/thorlabs_MDT694B/blob/main/thorlabs_MDT694B.py
+
+
+```
+> lsusb
+ Bus 002 Device 003: ID 1313:1004 ThorLabs MDT694B
+```
+
+```
+$> ls -l /dev/serial/by-id/usb-Thorlabs__Inc._MDT694B_160816175403-if01 
+lrwxrwxrwx 1 root root 13 12 sept. 16:38 /dev/serial/by-id/usb-Thorlabs__Inc._MDT694B_160816175403-if01 -> ../../ttyACM0
+```
+
+``` PYTHON
+>>> import serial
+>>> ser = serial.Serial('/dev/ttyACM0')
+>>> ser.
+ser.BAUDRATES                 ser.closed                    ser.getRI()                   ser.out_waiting               ser.readline(                 ser.setRTS(
+ser.BAUDRATE_CONSTANTS        ser.cts                       ser.getSettingsDict()         ser.parity                    ser.readlines(                ser.set_input_flow_control(
+ser.BYTESIZES                 ser.dsr                       ser.get_settings()            ser.pipe_abort_read_r         ser.reset_input_buffer()      ser.set_low_latency_mode(
+ser.PARITIES                  ser.dsrdtr                    ser.inWaiting()               ser.pipe_abort_read_w         ser.reset_output_buffer()     ser.set_output_flow_control(
+ser.STOPBITS                  ser.dtr                       ser.in_waiting                ser.pipe_abort_write_r        ser.ri                        ser.stopbits
+ser.applySettingsDict(        ser.exclusive                 ser.interCharTimeout          ser.pipe_abort_write_w        ser.rs485_mode                ser.tell()
+ser.apply_settings(           ser.fd                        ser.inter_byte_timeout        ser.port                      ser.rts                       ser.timeout
+ser.baudrate                  ser.fileno()                  ser.iread_until(              ser.portstr                   ser.rtscts                    ser.truncate(
+ser.break_condition           ser.flush()                   ser.isOpen()                  ser.read(                     ser.seek(                     ser.writable()
+ser.bytesize                  ser.flushInput()              ser.is_open                   ser.read_all()                ser.seekable()                ser.write(
+ser.cancel_read()             ser.flushOutput()             ser.isatty()                  ser.read_until(               ser.sendBreak(                ser.writeTimeout
+ser.cancel_write()            ser.getCD()                   ser.name                      ser.readable()                ser.send_break(               ser.write_timeout
+ser.cd                        ser.getCTS()                  ser.nonblocking()             ser.readall()                 ser.setDTR(                   ser.writelines(
+ser.close()                   ser.getDSR()                  ser.open()                    ser.readinto(                 ser.setPort(                  ser.xonxoff
+>>> ser = serial.Serial('/dev/ttyACM0', 115200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, xonxoff=False)
+# xonxoff (bool) – Enable software flow control
+>>> ser.write(b'?\n')
+2
+>>> ser.read_all()
+b'?\t\tGets list of all available commands.\rID?\t\tGets the product header and firmware version.\rRESTORE\t\tRestores all settings to their default values.\rECHO?\t\tGets echo status.\rECHO=\t\tSets echo status, (0=Off, 1=On) When on all commands are echoed back.\rVLIMIT?\t\tGets output voltage limit switch setting (0=75V, 1=100V, 2=150V).\rINTENSITY?\tGets display intensity (0-15).\rINTENSITY=\tSets display intensity (0-15).\rXVOLTAGE?\tGets the output voltage for the x axis.\rXVOLTAGE=\tSets the output voltage for the x axis.\rXMIN?\t\tGets the minimum output voltage limit for the x axis.\rXMIN=\t\tSets the minimum output voltage limit for the x axis.\rSYSMIN?\t\tGets the minimum output voltage limit for the system.\rSYSMIN=\t\tSets the minimum output voltage limit for the system.\rXMAX?\t\tGets the maximum output voltage limit for the x axis.\rXMAX=\t\tSets the maximum output voltage limit for the x axis.\rSYSMAX?\t\tGets the maximum output voltage limit for the system.\rSYSMAX=\t\tSets the maximum output voltage limit for the system.\rDACSTEP?\tGets channel step size used with up/down arrow keys. (1-5000).\rDACSTEP=\tSets channel step size used with up/down arrow keys. (1-5000).\rUp Arrow\tIncrease selected channel by the set step size.\rDown Arrow\tDecrease selected channel by the set step size.\rFRIENDLY?\tGets friendly name.\rFRIENDLY=\tSet friendly name.\rSERIAL?\t\tGets serial number.\rCM?\t\tGets MDT694A compatibility mode (0=Off, 1=On).\rCM=\t\tSets MDT694A compatibility mode (0=Off, 1=On).\rROTARYMODE?\tGets rotary mode. (0 = Default, 1 = 10 turn pot, 2 = fine)\rROTARYMODE=\tSets rotary mode. (0 = Default, 1 = 10 turn pot, 2 = fine)\r*'
+
+```
+
+
+
+
+
+*** Documentation :
+Once the USB drivers have been installed, the unit connected to the PC, and the power turned on, configure the
+terminal emulator as follows:
+ - Baud Rate = 115.2 kb/s
+ - Data Bits = 8
+ - Parity = None
+ - Stop Bits = 1
+ - Flow Control = None
+If the connection is correct you will see the following after pressing the “Enter” key.
